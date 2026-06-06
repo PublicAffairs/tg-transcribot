@@ -1,0 +1,7 @@
+.antigravitycli/
+.netlify/
+.vercel/
+.vscode
+node_modules/
+.env*
+PLAN.md
