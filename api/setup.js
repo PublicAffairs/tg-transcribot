@@ -1,0 +1,15 @@
+// api/setup.js
+// Vercel Serverless Function adapter for webhook configuration
+
+module.exports = async (req, res) => {
+  try {
+    const { handleVercelRequest } = await import('../lib/core.js');
+    return handleVercelRequest(req, res);
+  } catch (error) {
+    console.error('Error in Vercel setup wrapper:', error);
+    return res.status(500).json({
+      ok: false,
+      error: `Internal server exception: ${error.message || error}`
+    });
+  }
+};

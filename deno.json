@@ -1,0 +1,12 @@
+{
+  "deploy": {
+    "entrypoint": "src/deno.js"
+  },
+  "tasks": {
+    "start": "deno serve --port 3000 src/deno.js",
+    "dev": "deno serve --watch --port 3000 src/deno.js",
+    "set-webhook": "deno run --allow-net --allow-env scripts/set_webhook.js",
+    "test:remote": "deno run --allow-net scripts/test_remote.js",
+    "test:payload": "deno run scripts/test_webhook.js"
+  }
+}

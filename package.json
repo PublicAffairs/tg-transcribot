@@ -1,0 +1,17 @@
+{
+  "name": "tg-transcribot",
+  "version": "0.1.0",
+  "description": "Telegram bot for voice message transcription using Groq Whisper API",
+  "main": "api/webhook.js",
+  "scripts": {
+    "start": "node scripts/node_server.js",
+    "dev": "node scripts/node_server.js",
+    "set-webhook": "node scripts/set_webhook.js",
+    "test:remote": "node scripts/test_remote.js",
+    "test:payload": "node scripts/test_webhook.js",
+    "postinstall": "node scripts/postinstall.js"
+  },
+  "dependencies": {
+    "mux.js": "^6.3.0"
+  }
+}
