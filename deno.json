@@ -1,0 +1,20 @@
+{
+  "deploy": {
+    "entrypoint": "src/deno.js"
+  },
+  "tasks": {
+    "start": "deno serve --port 3000 src/deno.js",
+    "dev": "deno serve --watch --port 3000 src/deno.js",
+    "set-webhook": "deno run --allow-net --allow-env --allow-read scripts/ops_set_webhook.js",
+    "set-avatar": "deno run --allow-net --allow-env --allow-read scripts/ops_set_avatar.js",
+    "test:remote": "deno run --allow-net --allow-read tests/remote.js",
+    "test:payload": "deno run --allow-read scripts/dev_test_webhook.js",
+    "test:localization": "deno run --allow-read tests/localization.mjs",
+    "test:units": "deno run --allow-read --allow-write --allow-env tests/units.mjs",
+    "test:scenarios": "deno run --allow-read tests/scenarios.mjs",
+    "test:whitebox": "deno run --allow-read --allow-env tests/whitebox.mjs",
+    "test": "deno run --allow-read --allow-write --allow-env --allow-run tests/run_all.mjs",
+    "coverage": "npx c8@latest node tests/run_all.mjs",
+    "check": "deno check api/**/*.js lib/**/*.js src/**/*.js scripts/**/*.js tests/**/*.js netlify/**/*.js"
+  }
+}

@@ -1,0 +1,13 @@
+.git*/
+.gitignore
+.env*
+node_modules/
+netlify/
+src/
+deno.json
+wrangler.jsonc
+netlify.toml
+*.md
+scripts/*
+!scripts/postinstall.js
+tests/

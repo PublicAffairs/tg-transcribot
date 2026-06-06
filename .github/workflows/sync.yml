@@ -1,0 +1,80 @@
+name: Sync Fork with Upstream
+
+# Runs every Sunday at midnight UTC, or on manual trigger.
+# Pulls new commits from PublicAffairs/tg-transcribot into this fork.
+#
+# Scenarios:
+#   1. Already up to date        → exits cleanly, nothing to push.
+#   2. New upstream commits,
+#      no local divergence       → fast-forward merge + push automatically.
+#   3. Local commits ahead of
+#      upstream                  → sync SKIPPED (warning); your changes are safe.
+#   4. Histories diverged, FF
+#      not possible              → sync ABORTED (error) with manual rebase instructions.
+#   5. Not a fork / upstream
+#      unreachable               → sync ABORTED (error) with setup instructions.
+#
+# See DEVNOTES.md § "Fork Sync Workflow" for full documentation.
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # Every Sunday at 00:00 UTC
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  sync:
+    if: github.event.repository.fork
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync upstream via GitHub API
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          
+          # 1. Check if the repository is actually a fork
+          echo "Fetching repository info from GitHub API..."
+          REPO_INFO=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}")
+          
+          IS_FORK=$(echo "$REPO_INFO" | grep '"fork":' | head -n 1 | awk '{print $2}' | tr -d ',"')
+          
+          if [ "$IS_FORK" != "true" ]; then
+            echo "ℹ️ This repository is not a fork according to the GitHub API. Sync skipped."
+            echo "💡 Tip: To disable these checks permanently, manually disable this workflow in the 'Actions' tab."
+            exit 0
+          fi
+          
+          # 2. Detect default branch
+          DEFAULT_BRANCH=$(echo "$REPO_INFO" | grep '"default_branch":' | head -n 1 | awk -F '"' '{print $4}')
+          if [ -z "$DEFAULT_BRANCH" ]; then
+            DEFAULT_BRANCH="master"
+          fi
+          echo "Default branch is $DEFAULT_BRANCH"
+          
+          # 3. Request upstream sync via API
+          echo "Requesting merge-upstream from GitHub API..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/merge-upstream" \
+            -d "{\"branch\":\"$DEFAULT_BRANCH\"}")
+            
+          if [ "$HTTP_STATUS" = "200" ]; then
+            echo "✅ Fork successfully synced with upstream."
+          elif [ "$HTTP_STATUS" = "204" ] || [ "$HTTP_STATUS" = "422" ]; then
+            echo "✅ Already up to date or no upstream commits (HTTP $HTTP_STATUS)."
+          elif [ "$HTTP_STATUS" = "409" ]; then
+            echo "::error::Fast-forward merge failed. Your fork has diverged and has conflicts (HTTP $HTTP_STATUS)."
+            exit 1
+          else
+            echo "::warning::Sync API returned HTTP $HTTP_STATUS. Please check repository status."
+          fi

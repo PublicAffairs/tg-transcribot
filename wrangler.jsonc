@@ -1,0 +1,9 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "telegram-transcribot",
+  "main": "src/index.js",
+  "compatibility_date": "2024-01-01",
+  "observability": {
+    "enabled": true
+  }
+}

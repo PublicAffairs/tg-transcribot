@@ -1,0 +1,12 @@
+[build]
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/setup"
+  to = "/.netlify/functions/setup"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/webhook"
+  status = 200

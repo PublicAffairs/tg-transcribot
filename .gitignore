@@ -1,0 +1,11 @@
+.netlify/
+.vercel/
+.vscode
+node_modules/
+.env*
+PLAN*.md
+
+# Local test/sample media files — not part of the project
+*.m4a
+*.ogg
+*.mp4

@@ -1,0 +1,29 @@
+{
+  "name": "tg-transcribot",
+  "version": "0.1.0",
+  "description": "Telegram bot for voice message transcription using Groq Whisper API",
+  "main": "api/webhook.js",
+  "scripts": {
+    "start": "node scripts/dev_node_server.js",
+    "dev": "node scripts/dev_node_server.js",
+    "set-webhook": "node scripts/ops_set_webhook.js",
+    "set-avatar": "node scripts/ops_set_avatar.js",
+    "test:remote": "node tests/remote.js",
+    "test:payload": "node scripts/dev_test_webhook.js",
+    "check": "node -e \"const { execSync } = require('child_process'); const { globSync } = require('fs'); globSync('{api,lib,src,scripts,tests,netlify}/**/*.js').forEach(f => execSync('node --check ' + f))\"",
+    "lint": "eslint .",
+    "test:localization": "node tests/localization.mjs",
+    "test:units": "node tests/units.mjs",
+    "test:scenarios": "node tests/scenarios.mjs",
+    "test:whitebox": "node tests/whitebox.mjs",
+    "test": "node tests/run_all.mjs",
+    "coverage": "npx c8@latest node tests/run_all.mjs"
+  },
+  "dependencies": {
+    "@vercel/functions": "^1.2.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.5.0"
+  }
+}

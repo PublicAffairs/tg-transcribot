@@ -1,0 +1,292 @@
+# Telegram Voice Transcribot 🎤🤖
+
+A high-performance Telegram [bot](https://core.telegram.org/bots) that transcribes voice messages and audio files into clean text
+using the **[Whisper](https://github.com/openai/whisper) API**
+(by default: free-tier [groq](https://groq.com/) service). 
+
+It is designed to run completely **serverless**, making it fast, free, and incredibly simple to deploy.
+
+---
+
+## ☁️ Serverless!
+
+Deploying this bot as a Serverless Function gives you incredible benefits compared to traditional hosting:
+- **Zero Cost**: Generous free tiers on Vercel, Cloudflare, Deno, and Val Town mean you pay absolutely nothing.
+- **Zero Maintenance**: No need to rent a VPS, manage operating systems, or keep background scripts running 24/7.
+- **Instant & Efficient**: Unlike traditional containers that suffer from slow cold starts and waste resources by idling,
+  your serverless bot wakes up instantly to process messages and scales down to zero immediately after. No idle waste!
+
+---
+
+## 🏆 Why Transcribot vs Telegram Premium?
+
+Telegram has built-in voice transcription. Why deploy your own bot?
+- **Superior Quality**: Works noticeably more accurately by better understanding context, jargon, and accents.
+- **Lightning Fast**: Transcriptions arrive almost instantly.
+- **Zero Clicks**: Automatically replies with text. No need to click "→A" for every message.
+- **Free Forever**: Works without a Telegram Premium subscription.
+
+---
+
+## 🌟 Key Features
+
+- **Audio & Video Note Transcription**:
+  Transcribes standard voice messages, audio files, and Telegram [video notes] (circles) automatically.
+- **Direct Chat**:
+  Send or forward voice messages directly to the bot in a private chat.
+- **Group Mode**:
+  Add the bot to any group chat to transcribe voice messages for all members.
+- **[Guest] Mode**:
+  Access the bot seamlessly from any chat by mentioning it by `@botname` without adding it.
+- **[Secretary] Mode**:
+  Integrates directly with your personal Telegram account to intercept voice messages and post transcriptions on your behalf.
+- **Multilingual Transcription**:
+  Powered by the [Whisper](https://openai.com/index/whisper/) model for highly accurate, multilingual transcription.
+- **Owner Notifications**:
+  Instantly notifies you when the bot is added to a new group (with an automatic invite link) or when its Secretary status changes.
+
+[video notes]: https://telegram.org/blog/video-message-and-telescope
+[Guest]: https://core.telegram.org/bots/features#guest-bots
+[Secretary]: https://core.telegram.org/bots/features#secretary-bots
+
+---
+
+## 🛠️ Requirements
+
+To get started, you will need the following accounts and tokens:
+* **Telegram Account**: To create the bot and receive transcriptions.
+* **Groq Account**: To get a free API key for lightning-fast Whisper transcriptions.
+  Register at [console.groq.com](https://console.groq.com).  
+  Alternatively: use any other provider by specifying the corresponding `WHISPER_API_BASE` variable.
+* **Account** on a serverless cloud platform of your choice (see below)!
+
+---
+
+## 🤖 Creating Your Telegram Bot
+
+Before deploying, you need to register a new bot and configure its privacy.
+
+1. Open [@BotFather](https://t.me/BotFather) on Telegram.
+2. Send the `/newbot` command and follow the prompts to choose a name and username.
+3. Copy the **HTTP API Token** provided by BotFather. This is your `TELEGRAM_BOT_TOKEN`.
+
+> [!IMPORTANT]
+> Once the bot is running, additional settings (active modes, transcription language, model, notifications, and more)
+> can be configured directly from Telegram via the `/help` command.
+
+<details>
+<summary>Click to view Privacy Configuration Guide</summary>
+
+#### Restricting Direct Interactions
+By default, anyone can start a chat and interact with your bot.
+To prevent unauthorized usage and protect your API limits, you can restrict access to specific users:
+1. Open the **@BotFather**'s [Mini App](https://t.me/BotFather?startapp).
+2. Select your bot and navigate to **Bot Settings**.
+3. Scroll down to the **Access** section at the bottom.
+4. Here, you can disable public access and explicitly specify which users are allowed to use your bot.
+
+#### Group Privacy Settings
+To control what messages the bot can read when in a group:
+1. Message [@BotFather](https://t.me/BotFather) and send `/setprivacy`.
+2. Select your bot.
+3. Set it to **Enabled** (this is the default).
+  In this mode, the bot will only see voice/audio files explicitly sent as replies to it or when it is mentioned.
+  If you want the bot to transcribe *every* voice message in the group automatically, set this to **Disabled**
+  (which requires the bot to have "Access to Messages" permission).
+
+---
+
+The following settings are also available via the bot's personal chat:
+
+<details>
+
+#### Restricting Group Additions
+By default, anyone can add your bot to a group chat. You can disable this:
+1. Open a chat with [@BotFather](https://t.me/BotFather).
+2. Send the `/setjoingroups` command.
+3. Select your bot and set it to **Disabled**. Now, only you (the creator) can add it to groups.
+
+#### Enabling Guest Mode
+To allow users to mention the bot in any chat to transcribe forwarded voice messages without adding it to the chat:
+1. Open a chat with [@BotFather](https://t.me/BotFather).
+2. Select your bot → **Bot Settings** → **Guest Chat Mode**.
+3. Set it to **Enabled**. For details, see [Guest] Bots.
+
+#### Enabling Secretary Mode
+To connect the bot directly to your personal Telegram account as a personal secretary to transcribe incoming voice messages:
+1. Open a chat with [@BotFather](https://t.me/BotFather).
+2. Select your bot → **Bot Settings** → **Secretary Mode** (also known as _Business Mode_).
+3. Set it to **Enabled**. For details, see [Secretary] Bots.
+
+</details>
+</details>
+
+---
+
+## 🚀 Multi-Platform Deployment Options
+
+The bot runs using a unified core engine and thin adapters, allowing it to run serverless on almost any modern cloud platform.
+Choose your preferred environment below:
+
+> [!IMPORTANT]
+> **Pre-requisites and Next Steps**:
+> For any platform, you must configure the required [configuration variables](#-configuration-variables)
+> (`TELEGRAM_BOT_TOKEN`, `WHISPER_API_KEY`) during deployment.
+> Don't forget to [register the webhook](#-hooking-telegram-to-your-deployment) as your final step!
+
+
+### Deploy with [Vercel](https://vercel.com)
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FPublicAffairs%2Ftg-transcribot&env=TELEGRAM_BOT_TOKEN,WHISPER_API_KEY&envDescription=Add%20your%20Telegram%20Bot%20Token%20and%20Whisper%20API%20Key%20to%20setup%20the%20transcription%20service.&project-name=telegram-transcribot)
+
+<details>
+<summary>Alternatively: via Vercel CLI</summary>
+
+1. Install CLI: `npm install -g vercel`
+2. Log in: `vercel login`
+3. Configure environment variables in the Vercel Dashboard, or add them using:
+   ```bash
+   vercel env add TELEGRAM_BOT_TOKEN production --value "your_telegram_bot_token" --yes
+   vercel env add WHISPER_API_KEY production --value "your_whisper_api_key" --yes
+   ```
+4. Deploy: `vercel --prod --yes`
+</details>
+
+---
+
+### Deploy to [Cloudflare](https://www.cloudflare.com/products/workers/)
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/PublicAffairs/tg-transcribot)
+
+<details>
+<summary>Alternatively: via Wrangler CLI</summary>
+
+1. Deploy directly from the root directory using Wrangler:
+   ```bash
+   npx wrangler deploy
+   ```
+2. Set the required variables as secrets in the Cloudflare dashboard or Wrangler CLI:
+   ```bash
+   npx wrangler secret put TELEGRAM_BOT_TOKEN
+   npx wrangler secret put WHISPER_API_KEY
+   ```
+</details>
+
+---
+
+### Deploy to [Netlify](https://www.netlify.com/platform/core/functions/)
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/PublicAffairs/tg-transcribot)
+
+<details>
+<summary>Alternatively: via Netlify CLI</summary>
+
+1. Build and configure using the Netlify CLI from the root directory:
+   ```bash
+   npm install -g netlify-cli
+   netlify login
+   netlify init
+   ```
+2. Add the required environment variables in your Netlify site settings dashboard.
+3. Deploy the site:
+   ```bash
+   netlify deploy --prod --dir=.
+   ```
+</details>
+
+---
+
+### Deploy on [Deno](https://deno.com/learn/serverless-functions#deploying-your-serverless-function-to-deno-deploy)
+
+[![Deploy on Deno](https://deno.com/button)](https://console.deno.com/new?clone=https%3A%2F%2Fgithub.com%2FPublicAffairs%2Ftg-transcribot)
+
+<details>
+<summary>💻 Deploy via GitHub Integration</summary>
+
+1. Connect your GitHub repository to [Deno Deploy](https://dash.deno.com).
+2. Select `src/deno.js` as the entry point (this is automatically configured if Deno Deploy detects the `deno.json` file in the root).
+3. Set the required environment variables in the project's settings configuration panel.
+</details>
+
+---
+
+### [Val Town](https://www.val.town)
+Zero-setup interactive coding environment.
+
+<details>
+<summary>💻 Deploy via Forking (Recommended)</summary>
+
+1. Open the template Val at [val.town/v/publicaffairs/transcribot](https://www.val.town/v/publicaffairs/transcribot)
+   (or search for `transcribot` on Val Town).
+2. Click **Fork** to create your own copy.
+3. Add the required environment variables (`TELEGRAM_BOT_TOKEN`, `WHISPER_API_KEY`) in your Val Town environment settings.
+</details>
+
+<details>
+<summary>💻 Deploy via Val Town CLI (vt)</summary>
+
+1. Install the CLI using Deno:
+   ```bash
+   deno install -grAf jsr:@valtown/vt
+   ```
+2. Run the authentication prompt:
+   ```bash
+   vt
+   ```
+3. Sync your local files (including `src/deno.js`) to Val Town:
+   ```bash
+   vt push
+   ```
+</details>
+
+---
+
+## ⚙️ Configuration Variables
+
+| Variable | Description | Where to Get |
+| :--- | :--- | :--- |
+| **`TELEGRAM_BOT_TOKEN`** | The API token for your bot. | You received this when [creating your bot](#-creating-your-telegram-bot). You can always request it from [@BotFather](https://t.me/BotFather) again. |
+| **`WHISPER_API_KEY`** | API key to access the Whisper API. | Go to your provider's dashboard (e.g., [console.groq.com/keys](https://console.groq.com/keys) or [platform.openai.com](https://platform.openai.com)). |
+
+<details>
+<summary>⚙️ Optional Configuration Variables</summary>
+
+| Variable | Description | Default / Where to Get |
+| :--- | :--- | :--- |
+| **`WHISPER_API_BASE`** | The base URL of the OpenAI-compatible transcription API. | `https://api.groq.com/openai/v1` (change to use OpenAI or self-hosted servers). |
+| **`WHISPER_MODELS`** | Comma-separated list of Whisper models available via `/model` command. The first model in the list is used by default. | e.g. `whisper-large-v3-turbo,whisper-large-v3` |
+| **`WHISPER_PROMPT`** | Default system instruction prompt sent to Whisper transcription. | e.g. `Transcribe this audio precisely.` |
+| **`OWNER`** | Pre-configured Telegram User ID or username allowed to claim ownership. | e.g. `12345678` or `@my_username` (restricts dynamic registration hijacking). |
+| **`WEBHOOK_BASE_URL`** | Explicit base URL for webhook registration (ignores dynamic host headers). | e.g. `https://my-custom-domain.com` |
+
+> **Note**: Transcription language, Whisper prompt, and other runtime options can be configured directly in Telegram using owner commands.
+> See `/help` after claiming ownership.
+
+</details>
+
+---
+
+## 🔗 Hooking Telegram to your Deployment
+
+1. Once your deployment is live, just **open your bot's URL in a browser** (e.g. `https://your-bot.example.com/`) - 
+   the webhook is configured **automatically**.  
+   *Note: The bot pre-validates the URL to ensure it is secure HTTPS, uses Telegram-supported ports [80, 88, 443, 8443],
+   does not resolve to localhost.
+   If validation fails, it displays a dashboard warning, keeping any existing production webhook intact.*
+2. **Send any private message to your bot** in Telegram.
+   The bot will automatically recognize you as the owner, and greet you with a settings panel.
+
+That's it — the bot is live! 🎉 Send a voice message to test transcription.
+
+---
+
+## 🔄 Staying Up to Date
+
+If you deployed Transcribot by forking the repository on GitHub, you can receive upstream updates automatically.
+
+The repository includes a **GitHub Actions workflow** (`.github/workflows/sync.yml`) that runs every **Sunday at 00:00 UTC**
+and pulls new commits from the upstream [`PublicAffairs/tg-transcribot`](https://github.com/PublicAffairs/tg-transcribot) repository into your fork.
+
+By default, GitHub disables Actions in newly forked repositories. If you **want** automatic weekly syncs, you must manually enable the workflow:
+1. Go to the **Actions** tab in your GitHub fork.
+2. Click the green button **"I understand my workflows, go ahead and enable them"**.
